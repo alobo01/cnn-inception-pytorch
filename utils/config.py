@@ -40,6 +40,24 @@ class StageCfg(DictLikeModel):
     bn_before_act: bool = True
 
 
+
+class StageCfgV3(DictLikeModel):
+    b0: int
+    b1: List[int]
+    b2: List[int]
+    pool_proj: int
+    use_bn: bool = True
+    use_se: bool = True
+    residual: bool = True
+    se_reduction: int = 16
+    dropout_p: float = 0.0
+    bn_before_act: bool = True
+    use_dropblock: bool = False
+    dropblock_size: int = 7
+    dropblock_prob: float = 0.0
+    drop_path_prob: float = 0.0
+
+
 class ClassifierConfig(DictLikeModel):
     layers: List[int] = Field(default_factory=lambda: [4096, 4096])
     dropout: float = 0.5
@@ -57,7 +75,7 @@ class StandardCNNConfig(ClassifyingModel):
     )
 
 class InceptionConfig(ClassifyingModel):
-    stage_cfgs: List[List[StageCfg]] = Field(
+    stage_cfgs: List[List[Union[StageCfg, StageCfgV3]]] = Field(
         default_factory=lambda: [
             [StageCfg(b0=64,  b1=[48,  64],  b2=[64,  96],  pool_proj=32)],
             [StageCfg(b0=128, b1=[96, 128], b2=[96, 128], pool_proj=64),

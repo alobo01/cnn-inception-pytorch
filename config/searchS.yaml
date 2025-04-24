@@ -53,20 +53,20 @@ augmentations:
     std: [0.229, 0.224, 0.225]
 
 training:
-  epochs:       150
+  epochs:       300
   batch_size:   64
-  patience: 20
-  lr:           0.01
-  weight_decay: 1e-4
-  momentum:     0.9
+  patience: 50
 
   optimizer:
-    type: sgd
+    type: adamw
+    params:
+      lr: 0.001
+      weight_decay: 0.0001
 
   scheduler:
     type: cosine
     params:
-      T_max: 150
+      T_max: 300
 
 
 # --- Hyperparameter tuning ----------------------------------------

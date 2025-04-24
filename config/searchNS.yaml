@@ -44,21 +44,22 @@ augmentations:
 
 # --- Training -----------------------------------------------------
 training:
-  epochs: 150           # Long training for stabilization
+  epochs: 300           # Long training for stabilization
   batch_size: 64        # Fits in ~12 GB GPU with mixed-precision
   training_mode: search
-  patience: 20
+  patience: 30
   optimizer:
-    type: sgd
+    type: rmsprop   # As they do in paper
     params:
-      lr: 0.1
+      lr: 0.01
+      alpha: 0.99
       momentum: 0.9
       weight_decay: 0.0001
-      nesterov: true
+
   scheduler:
     type: cosine
     params:
-      T_max: 150         # Matches the number of epochs
+      T_max: 300         # Matches the number of epochs
 
 # --- Hyperparameter tuning ----------------------------------------
 tuning:
