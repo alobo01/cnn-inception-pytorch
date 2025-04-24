@@ -1,0 +1,180 @@
+Starting hyperparameter search...
+=== Iteration 1 ===
+[Depth 0] model.use_bn=0 -> 0.6186
+[Depth 0] model.use_bn=0 -> 0.6166
+[Depth 0] model.use_bn=1 -> 0.5917
+[Depth 1] model.use_bn=0 -> 0.6179
+[Depth 1] model.use_bn=0 -> 0.6055
+[Depth 1] model.use_bn=0 -> 0.6131
+-> model.use_bn: best=0, score=0.6179, conv=True
+[Depth 0] model.dropout_cls=0.1 -> 0.5538
+[Depth 0] model.dropout_cls=0.35 -> 0.6269
+[Depth 0] model.dropout_cls=0.6 -> 0.5972
+[Depth 1] model.dropout_cls=0.22499999999999998 -> 0.6248
+[Depth 1] model.dropout_cls=0.35 -> 0.6179
+[Depth 1] model.dropout_cls=0.475 -> 0.6097
+[Depth 2] model.dropout_cls=0.22499999999999998 -> 0.6324
+[Depth 2] model.dropout_cls=0.2875 -> 0.6159
+[Depth 2] model.dropout_cls=0.35 -> 0.6276
+[Depth 3] model.dropout_cls=0.22499999999999998 -> 0.6393
+[Depth 3] model.dropout_cls=0.25625 -> 0.6317
+[Depth 3] model.dropout_cls=0.2875 -> 0.6303
+[Depth 4] model.dropout_cls=0.22499999999999998 -> 0.6131
+[Depth 4] model.dropout_cls=0.24062499999999998 -> 0.6228
+[Depth 4] model.dropout_cls=0.25625 -> 0.6228
+-> model.dropout_cls: best=0.24062499999999998, score=0.6228, conv=False
+[Depth 0] model.init_channels=32 -> 0.6076
+[Depth 0] model.init_channels=80 -> 0.5993
+[Depth 0] model.init_channels=128 -> 0.5828
+[Depth 1] model.init_channels=32 -> 0.5924
+[Depth 1] model.init_channels=56 -> 0.6055
+[Depth 1] model.init_channels=80 -> 0.5952
+[Depth 2] model.init_channels=44 -> 0.5876
+[Depth 2] model.init_channels=56 -> 0.5986
+[Depth 2] model.init_channels=68 -> 0.6110
+[Depth 3] model.init_channels=56 -> 0.6048
+[Depth 3] model.init_channels=62 -> 0.6069
+[Depth 3] model.init_channels=68 -> 0.6007
+[Depth 4] model.init_channels=59 -> 0.6028
+[Depth 4] model.init_channels=62 -> 0.6124
+[Depth 4] model.init_channels=65 -> 0.5966
+-> model.init_channels: best=62, score=0.6124, conv=False
+=== Iteration 2 ===
+Skipping model.use_bn, already converged.
+[Depth 0] model.dropout_cls=0.11562499999999998 -> 0.6359
+[Depth 0] model.dropout_cls=0.24062499999999998 -> 0.6166
+[Depth 0] model.dropout_cls=0.365625 -> 0.5966
+[Depth 1] model.dropout_cls=0.11562499999999998 -> 0.6441
+[Depth 1] model.dropout_cls=0.17812499999999998 -> 0.6441
+[Depth 1] model.dropout_cls=0.24062499999999998 -> 0.6193
+[Depth 2] model.dropout_cls=0.11562499999999998 -> 0.6303
+[Depth 2] model.dropout_cls=0.14687499999999998 -> 0.6324
+[Depth 2] model.dropout_cls=0.17812499999999998 -> 0.6186
+[Depth 3] model.dropout_cls=0.13124999999999998 -> 0.6386
+[Depth 3] model.dropout_cls=0.14687499999999998 -> 0.6159
+[Depth 3] model.dropout_cls=0.16249999999999998 -> 0.6117
+[Depth 4] model.dropout_cls=0.13124999999999998 -> 0.6372
+[Depth 4] model.dropout_cls=0.13906249999999998 -> 0.6455
+[Depth 4] model.dropout_cls=0.14687499999999998 -> 0.6200
+-> model.dropout_cls: best=0.13906249999999998, score=0.6455, conv=True
+[Depth 0] model.init_channels=38 -> 0.6110
+[Depth 0] model.init_channels=62 -> 0.6152
+[Depth 0] model.init_channels=86 -> 0.6055
+[Depth 1] model.init_channels=50 -> 0.5855
+[Depth 1] model.init_channels=62 -> 0.6083
+[Depth 1] model.init_channels=74 -> 0.6048
+[Depth 2] model.init_channels=56 -> 0.6021
+[Depth 2] model.init_channels=62 -> 0.6117
+[Depth 2] model.init_channels=68 -> 0.6124
+[Depth 3] model.init_channels=62 -> 0.5890
+[Depth 3] model.init_channels=65 -> 0.5841
+[Depth 3] model.init_channels=68 -> 0.6041
+[Depth 4] model.init_channels=65 -> 0.6007
+[Depth 4] model.init_channels=66 -> 0.6090
+[Depth 4] model.init_channels=68 -> 0.5883
+-> model.init_channels: best=66, score=0.6090, conv=True
+Hyperparameter search complete.
+Best hyperparameters: {'model.use_bn': np.int64(0), 'model.dropout_cls': np.float64(0.13906249999999998), 'model.init_channels': np.int64(66)}
+Best validation score: 0.6455
+Epoch 001/100: train_loss=2.9720 acc=0.131 | val_loss=2.5597 acc=0.190
+Epoch 002/100: train_loss=2.4381 acc=0.249 | val_loss=2.3879 acc=0.270
+Epoch 003/100: train_loss=2.3240 acc=0.293 | val_loss=2.2616 acc=0.310
+Epoch 004/100: train_loss=2.2233 acc=0.330 | val_loss=2.2137 acc=0.326
+Epoch 005/100: train_loss=2.1241 acc=0.370 | val_loss=2.0542 acc=0.374
+Epoch 006/100: train_loss=1.9847 acc=0.410 | val_loss=1.8797 acc=0.437
+Epoch 007/100: train_loss=1.8676 acc=0.443 | val_loss=1.8209 acc=0.441
+Epoch 008/100: train_loss=1.7971 acc=0.463 | val_loss=1.7408 acc=0.479
+Epoch 009/100: train_loss=1.7118 acc=0.485 | val_loss=1.6997 acc=0.508
+Epoch 010/100: train_loss=1.6445 acc=0.507 | val_loss=1.5948 acc=0.510
+Epoch 011/100: train_loss=1.5976 acc=0.518 | val_loss=1.6086 acc=0.521
+Epoch 012/100: train_loss=1.5359 acc=0.534 | val_loss=1.5572 acc=0.532
+Epoch 013/100: train_loss=1.4996 acc=0.547 | val_loss=1.4729 acc=0.552
+Epoch 014/100: train_loss=1.4533 acc=0.557 | val_loss=1.5199 acc=0.523
+Epoch 015/100: train_loss=1.4124 acc=0.571 | val_loss=1.4759 acc=0.550
+Epoch 016/100: train_loss=1.3827 acc=0.579 | val_loss=1.3916 acc=0.583
+Epoch 017/100: train_loss=1.3461 acc=0.591 | val_loss=1.3252 acc=0.601
+Epoch 018/100: train_loss=1.3124 acc=0.599 | val_loss=1.3605 acc=0.587
+Epoch 019/100: train_loss=1.2940 acc=0.598 | val_loss=1.3041 acc=0.598
+Epoch 020/100: train_loss=1.2618 acc=0.612 | val_loss=1.2949 acc=0.615
+Epoch 021/100: train_loss=1.2459 acc=0.620 | val_loss=1.3428 acc=0.605
+Epoch 022/100: train_loss=1.2123 acc=0.628 | val_loss=1.2498 acc=0.632
+Epoch 023/100: train_loss=1.1955 acc=0.633 | val_loss=1.2377 acc=0.621
+Epoch 024/100: train_loss=1.1651 acc=0.639 | val_loss=1.2605 acc=0.617
+Epoch 025/100: train_loss=1.1519 acc=0.642 | val_loss=1.1692 acc=0.641
+Epoch 026/100: train_loss=1.1345 acc=0.648 | val_loss=1.3010 acc=0.601
+Epoch 027/100: train_loss=1.1142 acc=0.653 | val_loss=1.1918 acc=0.634
+Epoch 028/100: train_loss=1.1046 acc=0.656 | val_loss=1.2025 acc=0.639
+Epoch 029/100: train_loss=1.0871 acc=0.663 | val_loss=1.1751 acc=0.648
+Epoch 030/100: train_loss=1.0778 acc=0.667 | val_loss=1.1481 acc=0.650
+Epoch 031/100: train_loss=1.0611 acc=0.666 | val_loss=1.0961 acc=0.673
+Epoch 032/100: train_loss=1.0391 acc=0.675 | val_loss=1.1245 acc=0.652
+Epoch 033/100: train_loss=1.0292 acc=0.682 | val_loss=1.1079 acc=0.662
+Epoch 034/100: train_loss=1.0144 acc=0.682 | val_loss=1.1228 acc=0.657
+Epoch 035/100: train_loss=0.9958 acc=0.689 | val_loss=1.0962 acc=0.678
+Epoch 036/100: train_loss=0.9905 acc=0.690 | val_loss=1.0884 acc=0.670
+Epoch 037/100: train_loss=0.9809 acc=0.695 | val_loss=1.0985 acc=0.668
+Epoch 038/100: train_loss=0.9707 acc=0.697 | val_loss=1.0618 acc=0.681
+Epoch 039/100: train_loss=0.9575 acc=0.700 | val_loss=1.0837 acc=0.661
+Epoch 040/100: train_loss=0.9459 acc=0.701 | val_loss=1.0411 acc=0.683
+Epoch 041/100: train_loss=0.9336 acc=0.709 | val_loss=1.0415 acc=0.687
+Epoch 042/100: train_loss=0.9231 acc=0.709 | val_loss=1.0037 acc=0.693
+Epoch 043/100: train_loss=0.9101 acc=0.712 | val_loss=1.0145 acc=0.692
+Epoch 044/100: train_loss=0.9020 acc=0.714 | val_loss=1.0292 acc=0.686
+Epoch 045/100: train_loss=0.8970 acc=0.716 | val_loss=1.0042 acc=0.700
+Epoch 046/100: train_loss=0.8851 acc=0.723 | val_loss=0.9902 acc=0.702
+Epoch 047/100: train_loss=0.8726 acc=0.724 | val_loss=1.0240 acc=0.681
+Epoch 048/100: train_loss=0.8722 acc=0.726 | val_loss=1.0184 acc=0.699
+Epoch 049/100: train_loss=0.8612 acc=0.724 | val_loss=0.9975 acc=0.690
+Epoch 050/100: train_loss=0.8528 acc=0.731 | val_loss=1.0052 acc=0.682
+Epoch 051/100: train_loss=0.8440 acc=0.733 | val_loss=1.0303 acc=0.681
+Epoch 052/100: train_loss=0.8382 acc=0.734 | val_loss=0.9767 acc=0.710
+Epoch 053/100: train_loss=0.8246 acc=0.740 | val_loss=0.9740 acc=0.706
+Epoch 054/100: train_loss=0.8268 acc=0.739 | val_loss=0.9712 acc=0.697
+Epoch 055/100: train_loss=0.8095 acc=0.742 | val_loss=1.0018 acc=0.689
+Epoch 056/100: train_loss=0.8114 acc=0.745 | val_loss=0.9693 acc=0.701
+Epoch 057/100: train_loss=0.8021 acc=0.745 | val_loss=0.9869 acc=0.701
+Epoch 058/100: train_loss=0.7991 acc=0.746 | val_loss=0.9579 acc=0.706
+Epoch 059/100: train_loss=0.7835 acc=0.753 | val_loss=0.9657 acc=0.710
+Epoch 060/100: train_loss=0.7852 acc=0.751 | val_loss=0.9394 acc=0.706
+Epoch 061/100: train_loss=0.7782 acc=0.754 | val_loss=0.9382 acc=0.715
+Epoch 062/100: train_loss=0.7658 acc=0.756 | val_loss=0.9383 acc=0.718
+Epoch 063/100: train_loss=0.7653 acc=0.756 | val_loss=0.9436 acc=0.710
+Epoch 064/100: train_loss=0.7603 acc=0.757 | val_loss=0.9219 acc=0.716
+Epoch 065/100: train_loss=0.7567 acc=0.758 | val_loss=0.9386 acc=0.723
+Epoch 066/100: train_loss=0.7497 acc=0.764 | val_loss=0.9372 acc=0.717
+Epoch 067/100: train_loss=0.7416 acc=0.763 | val_loss=0.9343 acc=0.710
+Epoch 068/100: train_loss=0.7393 acc=0.765 | val_loss=0.9207 acc=0.726
+Epoch 069/100: train_loss=0.7332 acc=0.765 | val_loss=0.9189 acc=0.714
+Epoch 070/100: train_loss=0.7195 acc=0.769 | val_loss=0.9314 acc=0.721
+Epoch 071/100: train_loss=0.7243 acc=0.769 | val_loss=0.9199 acc=0.718
+Epoch 072/100: train_loss=0.7161 acc=0.772 | val_loss=0.9050 acc=0.728
+Epoch 073/100: train_loss=0.7127 acc=0.772 | val_loss=0.9184 acc=0.724
+Epoch 074/100: train_loss=0.7108 acc=0.772 | val_loss=0.9023 acc=0.723
+Epoch 075/100: train_loss=0.7087 acc=0.773 | val_loss=0.9098 acc=0.719
+Epoch 076/100: train_loss=0.7007 acc=0.777 | val_loss=0.9106 acc=0.719
+Epoch 077/100: train_loss=0.6964 acc=0.778 | val_loss=0.9028 acc=0.725
+Epoch 078/100: train_loss=0.6958 acc=0.778 | val_loss=0.8970 acc=0.730
+Epoch 079/100: train_loss=0.6960 acc=0.780 | val_loss=0.8990 acc=0.728
+Epoch 080/100: train_loss=0.6873 acc=0.779 | val_loss=0.9069 acc=0.721
+Epoch 081/100: train_loss=0.6830 acc=0.780 | val_loss=0.8970 acc=0.724
+Epoch 082/100: train_loss=0.6789 acc=0.784 | val_loss=0.8964 acc=0.723
+Epoch 083/100: train_loss=0.6839 acc=0.782 | val_loss=0.8937 acc=0.728
+Epoch 084/100: train_loss=0.6811 acc=0.785 | val_loss=0.8862 acc=0.729
+Epoch 085/100: train_loss=0.6720 acc=0.786 | val_loss=0.8992 acc=0.723
+Epoch 086/100: train_loss=0.6696 acc=0.789 | val_loss=0.8879 acc=0.733
+Epoch 087/100: train_loss=0.6710 acc=0.786 | val_loss=0.8863 acc=0.730
+Epoch 088/100: train_loss=0.6684 acc=0.789 | val_loss=0.8860 acc=0.726
+Epoch 089/100: train_loss=0.6657 acc=0.787 | val_loss=0.8879 acc=0.726
+Epoch 090/100: train_loss=0.6669 acc=0.789 | val_loss=0.8850 acc=0.733
+Epoch 091/100: train_loss=0.6668 acc=0.787 | val_loss=0.8838 acc=0.734
+Epoch 092/100: train_loss=0.6628 acc=0.789 | val_loss=0.8849 acc=0.731
+Epoch 093/100: train_loss=0.6657 acc=0.789 | val_loss=0.8833 acc=0.728
+Epoch 094/100: train_loss=0.6576 acc=0.792 | val_loss=0.8803 acc=0.731
+Epoch 095/100: train_loss=0.6641 acc=0.790 | val_loss=0.8812 acc=0.728
+Epoch 096/100: train_loss=0.6579 acc=0.788 | val_loss=0.8807 acc=0.731
+Epoch 097/100: train_loss=0.6591 acc=0.793 | val_loss=0.8815 acc=0.726
+Epoch 098/100: train_loss=0.6575 acc=0.793 | val_loss=0.8807 acc=0.729
+Epoch 099/100: train_loss=0.6566 acc=0.790 | val_loss=0.8804 acc=0.729
+Epoch 100/100: train_loss=0.6547 acc=0.790 | val_loss=0.8804 acc=0.729
+Loading best model for final evaluation...
+Test loss: 0.9053 | Test acc: 0.730
