@@ -1,0 +1,36 @@
+dataset:
+  name:  MaMe
+  img_size: 256
+model:
+  training_type: underfit
+  type: StandardCNN
+  avg_pool2d: true
+  conv_blocks:
+    - num_blocks: 1
+      filters: 4
+      kernel_size: 4
+      use_bn: true
+      pool_kernel_size: 4
+      pool_stride: 4
+  
+  classifier:
+    layers: [1024]        # one hidden layer
+    dropout: 0.7          # high dropout
+    activation: ReLU      # activation in between
+
+training:
+  epochs:       50        
+  batch_size:   1024       # huge batch ⇒ very few parameter updates
+  patience:     50          # No early stopping
+
+  optimizer:
+    type: adamw
+    params:
+      lr: 0.001
+      weight_decay: 0.0001
+
+  scheduler:
+    type: step
+    params:
+      step_size: 10
+      gamma: 0.9

@@ -34,8 +34,8 @@ model:
       pool_stride: 2
 
   classifier:
-    layers:     []
-    dropout:    0.5
+    layers:     [2048, 1024]
+    dropout:    0.6
     activation: ReLU
 
 
@@ -60,7 +60,7 @@ training:
   optimizer:
     type: adamw
     params:
-      lr: 0.001
+      lr: 0.005
       weight_decay: 0.0001
 
   scheduler:
@@ -73,7 +73,7 @@ training:
 tuning:
   # Specify which cfg paths to tune and their [min, max] ranges
   param_grid:
-    model.classifier.dropout: [0.1, 0.6]
+    model.classifier.dropout: [0.1, 0.7]
 
   # Stopping tolerance: stop when range width < epsilon * original_range
   relative_epsilon: 0.1

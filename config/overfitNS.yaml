@@ -6,35 +6,23 @@ dataset:
 # --- Model --------------------------------------------------------
 model:
   type: InceptionNet
-  training_type: search
+  training_type: overfit
   classifier:
-    layers:     [2048, 1024]
-    dropout:    0.6
+    layers:     [65536]
+    dropout:    0.05
     activation: ReLU
-
   # ---------------------------------------------------------------
   # Inception stages ≈ GoogLeNet extended with SE + residual
   # ---------------------------------------------------------------
   stage_cfgs:
     # Stage 0 ➜ 64×64
-    - - { b0: 64,  b1: [48,  64],  b2: [64,  96],   pool_proj: 32,
-          use_bn: true,  use_se: true,   residual: false }
+    - - { b0: 32,  b1: [16,  32],  b2: [32,  64],   pool_proj: 16,
+          use_bn: false,  use_se: false,   residual: false }
 
-    # Stage 1 ➜ 32×32 (2 modules)
-    - - { b0: 128, b1: [96, 128], b2: [96, 128], pool_proj: 64,
-          use_bn: true,  use_se: true,   residual: true }
-      - { b0: 128, b1: [96, 128], b2: [96, 128], pool_proj: 64,
-          use_bn: true,  use_se: true,   residual: true }
-
-    # Stage 2 ➜ 16×16 (2 modules)
-    - - { b0: 192, b1: [96, 160], b2: [128,192], pool_proj: 96,
-          use_bn: true,  use_se: true,   residual: true }
-      - { b0: 192, b1: [96, 160], b2: [128,192], pool_proj: 96,
-          use_bn: true,  use_se: true,   residual: true }
 
 
 augmentations:
-  active: true
+  active: false
   resize: [256, 256]
   random_horizontal_flip: true
   random_rotation: 30
@@ -53,7 +41,7 @@ training:
   optimizer:
     type: rmsprop   # As they do in paper
     params:
-      lr: 0.005
+      lr: 0.01
       alpha: 0.99
       momentum: 0.9
       weight_decay: 0.0001
@@ -68,6 +56,7 @@ tuning:
   # Specify which cfg paths to tune and their [min, max] ranges
   param_grid:
     model.dropout_cls:    [0.1, 0.6]
+    training.lr:          [0.0001, 0.2]
 
   # Stopping tolerance: stop when range width < epsilon * original_range
   relative_epsilon: 0.05
