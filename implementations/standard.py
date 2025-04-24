@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 import torch
 import torch.nn as nn
@@ -68,9 +69,10 @@ class StandardCNN(nn.Module):
     def __init__(
         self,
         num_classes: int,
-        input_size: Sequence[int],
         conv_blocks: Sequence[ConvBlockConfig],
         classifier_cfg: ClassifierConfig,
+        avg_pool2d: bool = True,
+        input_shape: Sequence[int, int] = (256, 256),  # (H, W) of input images
     ) -> None:
         super().__init__()
         layers: list[nn.Module] = []
@@ -82,10 +84,29 @@ class StandardCNN(nn.Module):
             in_ch = block_cfg.filters
 
         self.features = nn.Sequential(*layers)
-        self.pool = nn.AdaptiveAvgPool2d(1)
-        # Shared classifier head expecting `in_ch` features
+         # Choose pooling vs. flatten
+        if avg_pool2d:
+            # Global avg pool to 1x1 + flatten
+            self.pool = nn.Sequential(
+                nn.AdaptiveAvgPool2d(1),
+                nn.Flatten(1)
+            )
+            classifier_in = in_ch
+        else:
+            # Flatten full feature map
+            self.pool = nn.Identity()
+            # Compute the flattened size after convolutions
+            h, w = input_shape[0], input_shape[1]
+            for block_cfg in conv_blocks:
+                for _ in range(block_cfg.num_blocks):
+                    h = h // block_cfg.pool_kernel_size
+                    w = w // block_cfg.pool_kernel_size
+            flattened_size = conv_blocks[-1].filters * h * w
+            classifier_in = flattened_size
+
+        # Shared classifier head
         self.classifier = Classifier.from_config(
-            in_features=in_ch,
+            input_dim=classifier_in,
             num_classes=num_classes,
             cfg=classifier_cfg,
         )
@@ -117,7 +138,7 @@ class StandardCNN(nn.Module):
             model_cfg = ModelConfig(**model_cfg)
         return cls(
             num_classes=num_classes,
-            input_size=model_cfg.input_size,
             conv_blocks=model_cfg.conv_blocks,
             classifier_cfg=model_cfg.classifier,
+            avg_pool2d=model_cfg.avg_pool2d,
         )
