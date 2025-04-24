@@ -22,30 +22,15 @@ def _get_model(cfg: Config, num_classes: int) -> torch.nn.Module:
         raise ValueError(f"Unknown model '{name}'")
 
     mod = importlib.import_module(module_map[name])
+    
     ModelCls = getattr(mod, name)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    if name == "InceptionNet":
-        # InceptionNet provides its own factory
-        return ModelCls.build_from_config(
-            cfg.model.model_dump(), num_classes
-        ).to(device)
+    return ModelCls.build_from_config(
+        cfg.model.model_dump(), num_classes
+    ).to(device)
 
-    elif name == "StandardCNN":
-        return ModelCls.build_from_config(
-            cfg.model.model_dump(), num_classes
-        ).to(device)
-    elif name == "TransferLearningCNN":
-        return ModelCls(
-            num_classes=num_classes,
-            trainable_layers=cfg.model.trainable_layers,
-            weights_path=cfg.model.weights_path,
-            classifier_layers=cfg.model.classifier.layers,
-            classifier_dropout=cfg.model.classifier.dropout,
-            classifier_activation=cfg.model.classifier.activation,
-            device=device,
-        )
 
 def _get_optimizer(
     cfg: Config, model: torch.nn.Module
