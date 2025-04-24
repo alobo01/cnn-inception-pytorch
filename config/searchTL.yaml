@@ -1,0 +1,66 @@
+# config.yaml
+
+dataset:
+  name:  MyDataset
+  img_size: 224
+
+model:
+  type: TransferLearningCNN  # or StandardCNN, or InceptionNet
+  training_mode: searchTL
+
+  # — only for TransferLearningCNN (ignored by Inception) —
+  trainable_layers: 2
+  weights_path: vgg19.pth
+  classifier:
+    layers:     [1024, 512]
+    dropout:    0.5
+    activation: ReLU
+
+training:
+  epochs:       200
+  batch_size:   64
+  patience: 20
+
+  optimizer:
+    type: adam
+    params:
+      lr: 0.001
+      weight_decay: 0.0001
+      momentum: 0.9
+
+  scheduler:
+    type: cosine
+    params:
+      T_max: 200
+
+
+
+augmentations:
+  active: true
+  resize: [256, 256]
+  random_horizontal_flip: true
+  random_rotation: 30
+  random_resized_crop: [256, 256]
+  scale: [0.8, 1.0]
+  normalize:
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+
+# --- Hyperparameter tuning ----------------------------------------
+tuning:
+  # Specify which cfg paths to tune and their [min, max] ranges
+  param_grid:
+    model.trainable_layers: [0, 4]
+    model.classifier.dropout:    [0.1, 0.6]
+
+  # Stopping tolerance: stop when range width < epsilon * original_range
+  relative_epsilon: 0.05
+
+  # Depth of recursive narrowing (max number of refinements per param)
+  max_depth: 3
+
+  # How many candidates to sample each pass (e.g. [low, mid, high])
+  num_candidates: 3
+
+  # How many epochs to train per trial evaluation
+  search_epochs: 50
