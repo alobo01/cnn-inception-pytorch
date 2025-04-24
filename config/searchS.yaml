@@ -1,0 +1,92 @@
+# config.yaml
+
+dataset:
+  name:  MyDataset
+  img_size: 224
+
+model:
+  type: StandardCNN  # or StandardCNN, or InceptionNet
+  training_mode: searchS
+  # — only for StandardCNN (ignored by Inception) —
+  init_channels: 64
+  use_bn: true
+  dropout_cls: 0.5
+  conv_blocks:
+    - num_blocks: 1
+      filters: 64
+      kernel_size: 3
+      use_bn: true
+      pool_kernel_size: 2
+      pool_stride: 2
+    
+    - num_blocks: 1
+      filters: 128
+      kernel_size: 3
+      use_bn: true
+      pool_kernel_size: 2
+      pool_stride: 2
+
+    - num_blocks: 1
+      filters: 256
+      kernel_size: 3
+      use_bn: true
+      pool_kernel_size: 2
+      pool_stride: 2
+
+  classifier:
+    layers:     []
+    dropout:    0.5
+    activation: ReLU
+
+
+
+
+augmentations:
+  active: true
+  resize: [256, 256]
+  random_horizontal_flip: true
+  random_rotation: 30
+  random_resized_crop: [256, 256]
+  scale: [0.8, 1.0]
+  normalize:
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+
+training:
+  epochs:       150
+  batch_size:   64
+  patience: 20
+  lr:           0.01
+  weight_decay: 1e-4
+  momentum:     0.9
+
+  optimizer:
+    type: sgd
+
+  scheduler:
+    type: cosine
+    params:
+      T_max: 150
+
+
+# --- Hyperparameter tuning ----------------------------------------
+tuning:
+  # Specify which cfg paths to tune and their [min, max] ranges
+  param_grid:
+    model.classifier.dropout: [0.1, 0.6]
+
+  # Stopping tolerance: stop when range width < epsilon * original_range
+  relative_epsilon: 0.1
+
+  # Depth of recursive narrowing (max number of refinements per param)
+  max_depth: 3
+
+  # How many candidates to sample each pass (e.g. [low, mid, high])
+  num_candidates: 3
+
+  # How many epochs to train per trial evaluation
+  search_epochs: 50
+
+  search_csv: search_results_standard.csv  # Path to save the search results
+
+  silent: false  # Set to true to suppress output during tuning

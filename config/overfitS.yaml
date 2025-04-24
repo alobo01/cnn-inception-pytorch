@@ -1,0 +1,70 @@
+dataset:
+  name:  MyDataset
+  img_size: 256
+
+model:
+  type: StandardCNN  # or StandardCNN, or InceptionNet
+  training_mode: overfitS
+  use_bn: false
+  avg_pool2d: false
+  conv_blocks:
+    - num_blocks: 1
+      filters: 128
+      kernel_size: 2
+      use_bn: false
+      pool_kernel_size: 2
+      pool_stride: 2
+    - num_blocks: 1
+      filters: 128
+      kernel_size: 2
+      use_bn: false
+      pool_kernel_size: 2
+      pool_stride: 2
+    - num_blocks: 1
+      filters: 128
+      kernel_size: 2
+      use_bn: false
+      pool_kernel_size: 2
+      pool_stride: 2
+    - num_blocks: 1
+      filters: 128
+      kernel_size: 2
+      use_bn: false
+      pool_kernel_size: 2
+      pool_stride: 2
+
+
+  classifier:
+    layers:     [65536]
+    dropout:    0.05
+    activation: ReLU
+
+
+
+augmentations:
+  active: false
+  resize: [256, 256]
+  random_horizontal_flip: true
+  random_rotation: 30
+  random_resized_crop: [256, 256]
+  scale: [0.8, 1.0]
+  normalize:
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+
+training:
+  epochs:       50
+  batch_size:   8
+  patience: 50
+  
+  batch_size: 8
+  num_epochs: 50
+  optimizer: 
+    type: "adam"
+    params:
+      lr: 0.001
+  scheduler:
+    type: step
+    params:
+      step_size: 10
+      gamma: 0.9
