@@ -1,6 +1,5 @@
 import importlib
 import torch
-import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
@@ -11,10 +10,6 @@ import torch.optim as optim
 # --------------------------------------------------------------------------- #
 #                                BUILDERS                                     #
 # --------------------------------------------------------------------------- #
-
-
-def _make_criterion(cfg: Config) -> nn.Module:
-    return torch.nn.CrossEntropyLoss(label_smoothing=cfg.training.label_smoothing)
 
 def _get_model(cfg: Config, num_classes: int) -> torch.nn.Module:
     name = cfg.model.type
@@ -31,58 +26,43 @@ def _get_model(cfg: Config, num_classes: int) -> torch.nn.Module:
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    return ModelCls.build_from_config(
-        cfg.model.model_dump(),  # dumps into a dict
-        num_classes
-    ).to(device)
+    if name == "InceptionNet":
+        # InceptionNet provides its own factory
+        return ModelCls.build_from_config(
+            cfg.model.model_dump(), num_classes
+        ).to(device)
 
-def _get_optimizer(cfg: Config, model: torch.nn.Module) -> torch.optim.Optimizer:
-    opt_name     = cfg.training.optimizer.type.lower()
-    user_params  = dict(cfg.training.optimizer.params or {})
+    elif name == "StandardCNN":
+        return ModelCls.build_from_config(
+            cfg.model.model_dump(), num_classes
+        ).to(device)
+    elif name == "TransferLearningCNN":
+        return ModelCls(
+            num_classes=num_classes,
+            trainable_layers=cfg.model.trainable_layers,
+            weights_path=cfg.model.weights_path,
+            classifier_layers=cfg.model.classifier.layers,
+            classifier_dropout=cfg.model.classifier.dropout,
+            classifier_activation=cfg.model.classifier.activation,
+            device=device,
+        )
 
-    # pull from nested params first, else fallback
-    lr           = user_params.pop("lr", cfg.training.lr)
-    weight_decay = user_params.pop("weight_decay", cfg.training.weight_decay)
+def _get_optimizer(
+    cfg: Config, model: torch.nn.Module
+) -> torch.optim.Optimizer:
+    opt_name = cfg.training.optimizer.type.lower()
+    params   = cfg.training.optimizer.params or {}
+
+    params.update(params)                       # YAML overrides params
 
     if opt_name == "sgd":
-        momentum = user_params.pop("momentum", cfg.training.momentum)
-        nesterov = user_params.pop("nesterov", False)
-        return optim.SGD(
-            model.parameters(),
-            lr=lr,
-            weight_decay=weight_decay,
-            momentum=momentum,
-            nesterov=nesterov,
-            **user_params,            # any extra flags
-        )
-
-    elif opt_name in {"adam", "adamw"}:
-        # for Adam/AdamW, sensible defaults if neither top‐level nor nested
-        betas = user_params.pop("betas", (0.9, 0.999))
-        eps   = user_params.pop("eps", 1e-8)
-
-        OptimCls = optim.AdamW if opt_name == "adamw" else optim.Adam
-        return OptimCls(
-            model.parameters(),
-            lr=lr,
-            weight_decay=weight_decay,
-            betas=betas,
-            eps=eps,
-            **user_params,
-        )
-
+        return optim.SGD(model.parameters(), **params)
+    elif opt_name == "adam":
+        return optim.Adam(model.parameters(), **params)
+    elif opt_name == "adamw":
+        return optim.AdamW(model.parameters(), **params)
     elif opt_name == "rmsprop":
-        momentum = user_params.pop("momentum", cfg.training.momentum)
-        eps      = user_params.pop("eps", 1e-8)
-        return optim.RMSprop(
-            model.parameters(),
-            lr=lr,
-            weight_decay=weight_decay,
-            momentum=momentum,
-            eps=eps,
-            **user_params,
-        )
-
+        return optim.RMSprop(model.parameters(), **params)
     else:
         raise ValueError(f"Unsupported optimiser '{opt_name}'")
 
@@ -111,60 +91,44 @@ def _get_scheduler(
     else:
         raise ValueError(f"Unsupported scheduler '{name}'")
 
-def train_one_epoch(model, loader, criterion, optimizer, scaler, device, aux_w=0.3):
-    model.train()
-    running_loss = running_correct = tot = 0
-    multi = getattr(model, "using_multi_classifier", False)
 
+def train_one_epoch(model, loader: DataLoader, criterion, optimizer, scaler, device):
+    model.train()
+    running_loss = 0.0
+    running_correct = 0
+    tot = 0
     for imgs, labels in tqdm(loader, desc="Train", leave=False):
         imgs, labels = imgs.to(device, non_blocking=True), labels.to(device)
         optimizer.zero_grad(set_to_none=True)
-
         with torch.amp.autocast(device_type=device.type):
-            outs = model(imgs)
-            if multi and isinstance(outs, tuple):
-                main, aux1, aux2 = outs
-                loss = (criterion(main, labels) +
-                        aux_w * criterion(aux1, labels) +
-                        aux_w * criterion(aux2, labels))
-                preds = main.argmax(1)
-            else:
-                loss  = criterion(outs, labels)
-                preds = outs.argmax(1)
-    
+            outputs = model(imgs)
+            loss = criterion(outputs, labels)
         scaler.scale(loss).backward()
         scaler.step(optimizer)
         scaler.update()
 
-        running_loss   += loss.item() * imgs.size(0)
+        preds = outputs.argmax(dim=1)
+        running_loss += loss.item() * imgs.size(0)
         running_correct += preds.eq(labels).sum().item()
-        tot            += imgs.size(0)
+        tot += imgs.size(0)
 
     return running_loss / tot, running_correct / tot
 
 
-def evaluate(model, loader, criterion, device, aux_w=0.3):
+def evaluate(model, loader: DataLoader, criterion, device):
     model.eval()
-    loss_sum = correct = tot = 0
-    multi = getattr(model, "using_multi_classifier", False)
-
+    loss_sum = 0.0
+    correct = 0
+    tot = 0
     with torch.no_grad():
         for imgs, labels in tqdm(loader, desc="Val", leave=False):
             imgs, labels = imgs.to(device, non_blocking=True), labels.to(device)
-            outs = model(imgs)
-            if multi and isinstance(outs, tuple):
-                main, aux1, aux2 = outs
-                loss = (criterion(main, labels) +
-                        aux_w * criterion(aux1, labels) +
-                        aux_w * criterion(aux2, labels))
-                preds = main.argmax(1)
-            else:
-                loss  = criterion(outs, labels)
-                preds = outs.argmax(1)
+            outputs = model(imgs)
+            loss = criterion(outputs, labels)
 
+            preds = outputs.argmax(dim=1)
             loss_sum += loss.item() * imgs.size(0)
-            correct  += preds.eq(labels).sum().item()
-            tot      += imgs.size(0)
+            correct += preds.eq(labels).sum().item()
+            tot += imgs.size(0)
 
     return loss_sum / tot, correct / tot
-
