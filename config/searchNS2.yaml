@@ -1,0 +1,98 @@
+# --- Dataset ------------------------------------------------------
+dataset:
+  name: MAMe
+  img_size: 256
+
+# --- Model --------------------------------------------------------
+model:
+  type: InceptionNetV3
+  training_mode: train
+
+  classifier:
+    layers:     [2048, 1024]
+    dropout:    0.5
+    activation: ReLU
+
+  stem_cfg:
+    in_channels:      3
+    init_channels:   64
+    kernel_size:      7
+    conv_stride:      2
+    conv_padding:     3
+    bias:           false
+    use_bn:          true
+    pool_kernel_size: 3
+    pool_stride:      2
+    pool_padding:     1
+
+  stages:
+    - blocks:
+        - b0: 64
+          b1: [48,  64]
+          b2: [64,  96]
+          pool_proj: 32
+          use_bn: true
+          use_se: true
+          residual: false
+          se_reduction: 16
+          dropout_p: 0.1
+          bn_before_act: true
+          drop_path_prob: 0.1    
+
+        - b0: 64
+          b1: [48,  64]
+          b2: [64,  96]
+          pool_proj: 32
+          use_bn: true
+          use_se: true
+          residual: true
+          se_reduction: 16
+          dropout_p: 0.2
+          bn_before_act: true
+          drop_path_prob: 0.15
+      downsample: true
+
+    - blocks:
+        - b0: 128
+          b1: [96, 128]
+          b2: [96, 128]
+          pool_proj: 64
+          use_bn: true
+          use_se: true
+          residual: true
+          se_reduction: 16
+          dropout_p: 0.25
+          bn_before_act: true
+          drop_path_prob: 0.2
+
+  use_multi_classifier: true
+
+augmentations:
+  active: true
+  resize: [256, 256]
+  random_horizontal_flip: true
+  random_rotation: 30
+  random_resized_crop: [240, 240]
+  scale: [0.8, 1.0]
+  normalize:
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+
+# --- Training -----------------------------------------------------
+training:
+  epochs:      300       # extended schedule
+  batch_size:   64
+  patience:     30
+  training_mode: train
+
+  optimizer:
+    type: adamw
+    params:
+      lr:           0.003    # increased for stronger initial updates
+      weight_decay: 0.01
+
+  scheduler:
+    type: cosine
+    params:
+      T_max:   300
+      eta_min: 0.000001

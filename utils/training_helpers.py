@@ -17,6 +17,7 @@ def _get_model(cfg: Config, num_classes: int) -> torch.nn.Module:
         "InceptionNet":         "implementations.inception",
         "StandardCNN":          "implementations.standard",
         "TransferLearningCNN":  "implementations.transfer_learning",
+        "InceptionNetV3":       "implementations.inceptionv3",
     }
     if name not in module_map:
         raise ValueError(f"Unknown model '{name}'")

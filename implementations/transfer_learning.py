@@ -116,7 +116,7 @@ class TransferLearningCNN(nn.Module):
 
         # Attach feature extractor and pooling
         self.features = base.features
-        self.avgpool = base.avgpool
+        self.avgpool = nn.AdaptiveAvgPool2d((1,1))
 
         # after self.features and self.avgpool are set up:
         with torch.no_grad():

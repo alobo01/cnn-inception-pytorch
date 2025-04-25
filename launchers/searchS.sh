@@ -27,4 +27,4 @@
 module purgue
 module load  impi  intel  hdf5  mkl  python/3.12.1-gcc
 
-python train.py --config config/searchS.yaml --tune
+time python train.py --config config/searchS.yaml

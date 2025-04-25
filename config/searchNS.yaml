@@ -6,31 +6,65 @@ dataset:
 # --- Model --------------------------------------------------------
 model:
   type: InceptionNet
-  training_type: search
+  training_mode: search2
   classifier:
     layers:     [2048, 1024]
-    dropout:    0.6
+    dropout:    0.5
     activation: ReLU
 
+
+  stem_cfg:
+    use_bn: true
+    init_channels: 64
+    kernel_size: 7
+    pool_kernel_size: 2
   # ---------------------------------------------------------------
   # Inception stages ≈ GoogLeNet extended with SE + residual
   # ---------------------------------------------------------------
-  stage_cfgs:
-    # Stage 0 ➜ 64×64
-    - - { b0: 64,  b1: [48,  64],  b2: [64,  96],   pool_proj: 32,
-          use_bn: true,  use_se: true,   residual: false }
+  stages:
+    - blocks:
+        - b0:        64
+          b1:      [48,  64]
+          b2:      [64,  96]
+          pool_proj: 32
+          use_bn:    true
+          use_se:    true
+          residual:  false
+      downsample: true
 
-    # Stage 1 ➜ 32×32 (2 modules)
-    - - { b0: 128, b1: [96, 128], b2: [96, 128], pool_proj: 64,
-          use_bn: true,  use_se: true,   residual: true }
-      - { b0: 128, b1: [96, 128], b2: [96, 128], pool_proj: 64,
-          use_bn: true,  use_se: true,   residual: true }
+    - blocks:
+        - b0:        128
+          b1:      [96, 128]
+          b2:      [96, 128]
+          pool_proj: 64
+          use_bn:    true
+          use_se:    true
+          residual:  true
+        - b0:        128
+          b1:      [96, 128]
+          b2:      [96, 128]
+          pool_proj: 64
+          use_bn:    true
+          use_se:    true
+          residual:  true
+      downsample: true
 
-    # Stage 2 ➜ 16×16 (2 modules)
-    - - { b0: 192, b1: [96, 160], b2: [128,192], pool_proj: 96,
-          use_bn: true,  use_se: true,   residual: true }
-      - { b0: 192, b1: [96, 160], b2: [128,192], pool_proj: 96,
-          use_bn: true,  use_se: true,   residual: true }
+    - blocks:
+        - b0:        192
+          b1:      [96, 160]
+          b2:      [128,192]
+          pool_proj: 96
+          use_bn:    true
+          use_se:    true
+          residual:  true
+        - b0:        192
+          b1:      [96, 160]
+          b2:      [128,192]
+          pool_proj: 96
+          use_bn:    true
+          use_se:    true
+          residual:  true
+      downsample: false
 
 
 augmentations:
@@ -38,7 +72,7 @@ augmentations:
   resize: [256, 256]
   random_horizontal_flip: true
   random_rotation: 30
-  random_resized_crop: [256, 256]
+  random_resized_crop: [240, 240]
   scale: [0.8, 1.0]
   normalize:
     mean: [0.485, 0.456, 0.406]
@@ -47,40 +81,17 @@ augmentations:
 # --- Training -----------------------------------------------------
 training:
   epochs: 300           # Long training for stabilization
-  batch_size: 64        # Fits in ~12 GB GPU with mixed-precision
+  batch_size: 128      
   training_mode: search
-  patience: 30
+  patience: 40
   optimizer:
-    type: rmsprop   # As they do in paper
+    type: adamw   # As they do in paper
     params:
-      lr: 0.005
-      alpha: 0.99
-      momentum: 0.9
-      weight_decay: 0.0001
+      lr: 0.003
+      weight_decay: 0.02
 
   scheduler:
     type: cosine
     params:
       T_max: 300         # Matches the number of epochs
-
-# --- Hyperparameter tuning ----------------------------------------
-tuning:
-  # Specify which cfg paths to tune and their [min, max] ranges
-  param_grid:
-    model.dropout_cls:    [0.1, 0.6]
-
-  # Stopping tolerance: stop when range width < epsilon * original_range
-  relative_epsilon: 0.05
-
-  # Depth of recursive narrowing (max number of refinements per param)
-  max_depth: 5
-
-  # How many candidates to sample each pass (e.g. [low, mid, high])
-  num_candidates: 3
-
-  # How many epochs to train per trial evaluation
-  search_epochs: 30
-
-  search_csv: search_results_nonstandard.csv  # Path to save the search results
-
-  silent: false  # Set to true to suppress output during tuning
+      eta_min: 0.0001    # Minimum learning rate

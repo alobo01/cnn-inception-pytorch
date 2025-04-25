@@ -109,23 +109,65 @@ def main() -> None:
         fig.savefig(outdir / f"loss_curve_{model_name}.png", dpi=300)
         plt.close(fig)
 
-    # Combined validation accuracy -----------------------------------------------
+
+    # Combine all epoch‐level metrics into one big DataFrame
     all_acc = pd.concat(acc_frames, ignore_index=True)
+
+    # 1) Combined train & val loss across all models (existing) ----------------
     fig, ax = plt.subplots()
     for model, group in all_acc.groupby("model"):
-        sns.lineplot(data=group, x="epoch", y="val_acc", ax=ax, label=model)
-    ax.set(xlabel="Epoch", ylabel="Validation Accuracy", title="Validation accuracy comparison")
+        sns.lineplot(data=group, x="epoch", y="train_loss", ax=ax, label=f"{model} (train)")
+        sns.lineplot(data=group, x="epoch", y="val_loss",   ax=ax, label=f"{model} (val)")
+    ax.set(xlabel="Epoch", ylabel="Loss", title="Training & Validation Loss Comparison")
     fig.tight_layout()
-    fig.savefig(outdir / "val_acc_comparison.png", dpi=300)
+    fig.savefig(outdir / "loss_comparison_all.png", dpi=300)
     plt.close(fig)
 
-    # Combined validation loss ---------------------------------------------------
+    # 2) Combined train & val accuracy across all models (existing) ------------
+    fig, ax = plt.subplots()
+    for model, group in all_acc.groupby("model"):
+        sns.lineplot(data=group, x="epoch", y="train_acc", ax=ax, label=f"{model} (train)")
+        sns.lineplot(data=group, x="epoch", y="val_acc",   ax=ax, label=f"{model} (val)")
+    ax.set(xlabel="Epoch", ylabel="Accuracy", title="Training & Validation Accuracy Comparison")
+    fig.tight_layout()
+    fig.savefig(outdir / "acc_comparison_all.png", dpi=300)
+    plt.close(fig)
+
+    # ————————————————
+    # 3) Train‐only loss comparison ---------------------------------------------
+    fig, ax = plt.subplots()
+    for model, group in all_acc.groupby("model"):
+        sns.lineplot(data=group, x="epoch", y="train_loss", ax=ax, label=model)
+    ax.set(xlabel="Epoch", ylabel="Loss", title="Train Loss Comparison")
+    fig.tight_layout()
+    fig.savefig(outdir / "train_loss_comparison_all.png", dpi=300)
+    plt.close(fig)
+
+    # 4) Val‐only loss comparison -----------------------------------------------
     fig, ax = plt.subplots()
     for model, group in all_acc.groupby("model"):
         sns.lineplot(data=group, x="epoch", y="val_loss", ax=ax, label=model)
-    ax.set(xlabel="Epoch", ylabel="Validation Loss", title="Validation loss comparison")
+    ax.set(xlabel="Epoch", ylabel="Loss", title="Validation Loss Comparison")
     fig.tight_layout()
-    fig.savefig(outdir / "val_loss_comparison.png", dpi=300)
+    fig.savefig(outdir / "val_loss_comparison_all.png", dpi=300)
+    plt.close(fig)
+
+    # 5) Train‐only accuracy comparison -----------------------------------------
+    fig, ax = plt.subplots()
+    for model, group in all_acc.groupby("model"):
+        sns.lineplot(data=group, x="epoch", y="train_acc", ax=ax, label=model)
+    ax.set(xlabel="Epoch", ylabel="Accuracy", title="Train Accuracy Comparison")
+    fig.tight_layout()
+    fig.savefig(outdir / "train_acc_comparison_all.png", dpi=300)
+    plt.close(fig)
+
+    # 6) Val‐only accuracy comparison -------------------------------------------
+    fig, ax = plt.subplots()
+    for model, group in all_acc.groupby("model"):
+        sns.lineplot(data=group, x="epoch", y="val_acc", ax=ax, label=model)
+    ax.set(xlabel="Epoch", ylabel="Accuracy", title="Validation Accuracy Comparison")
+    fig.tight_layout()
+    fig.savefig(outdir / "val_acc_comparison_all.png", dpi=300)
     plt.close(fig)
 
     # CSV summary of best hyper-params -------------------------------------------

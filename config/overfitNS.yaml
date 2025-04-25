@@ -6,18 +6,42 @@ dataset:
 # --- Model --------------------------------------------------------
 model:
   type: InceptionNet
-  training_type: overfit
+  training_mode: overfit
+
   classifier:
-    layers:     [65536]
+    layers:     [32768, 4096]
     dropout:    0.05
     activation: ReLU
+
+  stem_cfg:
+    use_bn: false
+    init_channels: 64
+    kernel_size: 3
+    pool_kernel_size: 2
   # ---------------------------------------------------------------
   # Inception stages ≈ GoogLeNet extended with SE + residual
   # ---------------------------------------------------------------
-  stage_cfgs:
-    # Stage 0 ➜ 64×64
-    - - { b0: 32,  b1: [16,  32],  b2: [32,  64],   pool_proj: 16,
-          use_bn: false,  use_se: false,   residual: false }
+  stages:
+    - blocks:
+        - b0:        2048
+          b1:      [256, 1024]
+          b2:      [256, 1024]
+          pool_proj: 1024
+          use_bn:    false
+          use_se:    false
+          residual:  false
+      downsample: true
+
+    - blocks:
+        - b0:        8192
+          b1:      [256, 2048]
+          b2:      [256, 2048]
+          pool_proj: 2048
+          use_bn:    false
+          use_se:    false
+          residual:  false
+      downsample: false
+
 
 
 
@@ -35,41 +59,16 @@ augmentations:
 # --- Training -----------------------------------------------------
 training:
   epochs: 300           # Long training for stabilization
-  batch_size: 64        # Fits in ~12 GB GPU with mixed-precision
+  batch_size: 2
   training_mode: search
   patience: 30
   optimizer:
-    type: rmsprop   # As they do in paper
+    type: adam 
     params:
-      lr: 0.01
-      alpha: 0.99
-      momentum: 0.9
-      weight_decay: 0.0001
+      lr: 0.001
 
   scheduler:
-    type: cosine
+    type: step
     params:
-      T_max: 300         # Matches the number of epochs
-
-# --- Hyperparameter tuning ----------------------------------------
-tuning:
-  # Specify which cfg paths to tune and their [min, max] ranges
-  param_grid:
-    model.dropout_cls:    [0.1, 0.6]
-    training.lr:          [0.0001, 0.2]
-
-  # Stopping tolerance: stop when range width < epsilon * original_range
-  relative_epsilon: 0.05
-
-  # Depth of recursive narrowing (max number of refinements per param)
-  max_depth: 5
-
-  # How many candidates to sample each pass (e.g. [low, mid, high])
-  num_candidates: 3
-
-  # How many epochs to train per trial evaluation
-  search_epochs: 30
-
-  search_csv: search_results_nonstandard.csv  # Path to save the search results
-
-  silent: false  # Set to true to suppress output during tuning
+      step_size: 10
+      gamma: 0.9

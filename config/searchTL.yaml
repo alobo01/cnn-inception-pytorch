@@ -2,35 +2,35 @@
 
 dataset:
   name:  MyDataset
-  img_size: 224
+  img_size: 256
 
 model:
   type: TransferLearningCNN  # or StandardCNN, or InceptionNet
-  training_mode: searchTL
+  training_mode: searchTL12
 
-  # — only for TransferLearningCNN (ignored by Inception) —
-  trainable_layers: 2
+
+  trainable_layers: 0
   weights_path: vgg19.pth
   classifier:
-    layers:     [1024, 512]
+    layers:     [256, 128]
     dropout:    0.5
     activation: ReLU
 
 training:
-  epochs:       200
+  epochs:       300
   batch_size:   64
-  patience: 20
+  patience: 40
 
   optimizer:
     type: adamw
     params:
       lr: 0.005
-      weight_decay: 0.0001
+      weight_decay: 0.02
 
   scheduler:
     type: cosine
     params:
-      T_max: 200
+      T_max: 300
 
 
 

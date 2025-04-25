@@ -19,6 +19,17 @@ class DictLikeModel(BaseModel):
                 return default
         return cur
 
+class FactorisedConvConfig(DictLikeModel):
+    in_channels: int
+    out_channels: int
+    kernel_size: int
+    stride: int = 1
+    padding: Optional[int] = None
+    bias: bool = False
+    use_bn: bool = True
+    bn_before_act: bool = True
+
+
 class ConvBlockConfig(DictLikeModel):
     num_blocks: int
     filters: int
@@ -27,7 +38,7 @@ class ConvBlockConfig(DictLikeModel):
     pool_kernel_size: int
     pool_stride: int
 
-class StageCfg(DictLikeModel):
+class InceptionBlockConfig(DictLikeModel):
     b0: int
     b1: List[int]
     b2: List[int]
@@ -74,16 +85,29 @@ class StandardCNNConfig(ClassifyingModel):
         description="List of conv-blocks for StandardCNN"
     )
 
+class StemConfig(DictLikeModel):
+    """
+    Configuration for the network stem (initial Conv2d + BN + ReLU + Pool).
+    Defaults match the original constants: 7×7 conv with stride 2, padding 3, followed by 3×3 pool.
+    """
+    in_channels: int = 3
+    init_channels: int = 64
+    kernel_size: int = 7
+    conv_stride: int = 2
+    conv_padding: Optional[int] = None  # defaults to kernel_size // 2 if None
+    bias: bool = False
+    use_bn: bool = True
+    pool_kernel_size: int = 3
+    pool_stride: int = 2
+    pool_padding: Optional[int] = None  # defaults to pool_kernel_size // 2 if None
+
+class InceptionStageConfig(BaseModel):
+    blocks: List[InceptionBlockConfig] = []
+    downsample: bool = True
+
 class InceptionConfig(ClassifyingModel):
-    stage_cfgs: List[List[Union[StageCfg, StageCfgV3]]] = Field(
-        default_factory=lambda: [
-            [StageCfg(b0=64,  b1=[48,  64],  b2=[64,  96],  pool_proj=32)],
-            [StageCfg(b0=128, b1=[96, 128], b2=[96, 128], pool_proj=64),
-             StageCfg(b0=128, b1=[96, 128], b2=[96, 128], pool_proj=64)],
-            [StageCfg(b0=192, b1=[96,160],  b2=[128,192], pool_proj=96, use_se=True, residual=True),
-             StageCfg(b0=192, b1=[96,160],  b2=[128,192], pool_proj=96, use_se=True, residual=True)],
-        ]
-    )
+    stages: List[InceptionStageConfig]  = []
+    stem_cfg: StemConfig = StemConfig()
 
 class TransferLearningConfig(ClassifyingModel):
     trainable_layers: int = 0
@@ -113,6 +137,7 @@ class SchedulerConfig(DictLikeModel):
 class TrainingConfig(DictLikeModel):
     epochs: int = 90
     batch_size: int = 64
+    patience: int = 20
     optimizer: OptimizerConfig = OptimizerConfig()
     scheduler: SchedulerConfig = SchedulerConfig()
 

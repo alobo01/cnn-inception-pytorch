@@ -82,15 +82,16 @@ def main() -> None:
     model, optimizer, scheduler, criterion, scaler = build_from_cfg(
         cfg, num_classes, device
     )
-    print(f"Model: {model}")    
-    sys.exit(0)
+    print(f"Model: {model}")   
     # State file
     state_file = Path(f"{cfg.model.training_mode}_{cfg.model.type}_mame.pth")
     if state_file.exists():
         print(f"Overwriting model state from {state_file}")
 
     # Early stopping setup
-    patience = getattr(cfg.training, "patience", 20)
+    patience = cfg.training.get("patience", 20)
+    print(f"Patience for early stopping: {patience} epochs")
+    print(f"Training for {cfg.training.epochs} epochs")
     epochs_no_improve = 0
     best_acc = 0.0
 

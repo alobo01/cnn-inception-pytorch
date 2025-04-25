@@ -1,0 +1,63 @@
+dataset:
+  name: MAMe
+  img_size: 256
+
+model:
+  # use the InceptionConfig branch of ModelConfig
+  type: InceptionNet
+  training_mode: train
+
+  stem_cfg:
+    init_channels: 8     # tiny stem
+    use_bn: false        # remove normalization capacity
+
+  classifier:
+    layers:
+      - 1024
+    dropout: 0.7         # high dropout
+    activation: ReLU     # activation in between
+
+  stages:
+    # Stage 0 ➜ 64×64 (no further downsampling)
+    - blocks:
+        - b0: 8
+          b1: [4, 8]
+          b2: [4, 8]
+          pool_proj: 4
+          use_bn: false
+          use_se: false
+          residual: false
+      downsample: false
+
+    # Stage 1 ➜ 32×32
+    - blocks:
+        - b0: 8
+          b1: [4, 8]
+          b2: [4, 8]
+          pool_proj: 4
+          use_bn: false
+          use_se: false
+          residual: false
+      downsample: true
+
+    # Stage 2 ➜ 16×16
+    - blocks:
+        - b0: 8
+          b1: [4, 8]
+          b2: [4, 8]
+          pool_proj: 4
+          use_bn: false
+          use_se: false
+          residual: false
+      downsample: true
+
+training:
+  epochs: 50
+  batch_size: 1024
+  patience: 50
+
+  optimizer:
+    type: sgd
+    params:
+      lr: 0.001
+      weight_decay: 1.0
