@@ -1,6 +1,6 @@
 # Flexible CNN Training Framework
 
-Train and tune modern convolutional neural networks (CNN) with **one command and one YAML file**. This repository wraps a clean PyTorch training loop, multiple reference architectures, a reproducible hyper‑parameter search, a ready‑to‑use loader for the [MAMe fine‑art dataset](https://mame-datasets.github.io/), and utilities for evaluation and one‑off scripts.
+Train and tune modern convolutional neural networks (CNN) with **one command and one YAML file**. This repository wraps a clean PyTorch training loop, multiple reference architectures, a reproducible hyper‑parameter search, a ready‑to‑use loader for the [MAMe fine‑art dataset](https://hpai.bsc.es/MAMe-dataset/), and utilities for evaluation and one‑off scripts.
 
 ## ✨ Key features
 - **Plug‑and‑play architectures** – *StandardCNN*, *InceptionNet*, *InceptionNetV3* and *TransferLearningCNN* (VGG‑19 backbone) selectable via `model.type`.
@@ -70,7 +70,7 @@ scripts/
 Modify or extend as needed.
 
 ## 🔧 Configuration reference
-Each section of `config.yaml` is described in code comments and Pydantic docstrings (`utils/config.py`). See `configs/standardSearch.yaml` for a full example.
+Each section of `config.yaml` is described in code comments and Pydantic docstrings (`utils/config.py`). See `configs/searchS.yaml` for a full example.
 
 ## 📁 Repository layout
 ```
@@ -94,6 +94,21 @@ Each section of `config.yaml` is described in code comments and Pydantic docstri
 │   └── *.yaml
 ├── requirements.txt
 └── README.md
+```
+
+---
+
+### 📖 Citation
+
+If you use this framework in your research, please cite:
+
+```bibtex
+@misc{cnnframework2025,
+  title  = {Flexible CNN Training Framework},
+  author = {Antonio Lobo-Santos and Alejandro Guzmán-Requena},
+  year   = {2025},
+  url    = {https://github.com/alobo01/cnn-inception-pytorch}
+}
 ```
 
 ## 📜 License
